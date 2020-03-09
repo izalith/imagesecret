@@ -1,4 +1,5 @@
 # Image secret
+[![Build Status](https://travis-ci.org/izalith/imagesecret.svg?branch=master)](https://travis-ci.org/izalith/imagesecret)
 
  A tool that can be used to hide any secret information in images. JPEG and PNG images are supported.
  The most basic method - Least Significant Bit is used to store the data in images.
