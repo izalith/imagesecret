@@ -1,0 +1,15 @@
+*.log
+/out/
+/build/
+/logs/
+/node_modules/
+/dist/
+.idea
+.iml
+
+*.class
+*.jar
+*.war
+*.ear
+
+!gradle-wrapper.jar

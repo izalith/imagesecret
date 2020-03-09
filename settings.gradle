@@ -1,0 +1,5 @@
+rootProject.name = 'imagesecret'
+
+include 'steglib'
+include 'backend'
+include 'frontend'

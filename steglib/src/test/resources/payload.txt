@@ -1,0 +1,158 @@
+Spring Batch Introduction
+Many applications within the enterprise domain require bulk processing to perform business operations in mission critical environments. These business operations include:
+
+Automated, complex processing of large volumes of information that is most efficiently processed without user interaction. These operations typically include time-based events (such as month-end calculations, notices, or correspondence).
+
+Periodic application of complex business rules processed repetitively across very large data sets (for example, insurance benefit determination or rate adjustments).
+
+Integration of information that is received from internal and external systems that typically requires formatting, validation, and processing in a transactional manner into the system of record. Batch processing is used to process billions of transactions every day for enterprises.
+
+Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems. Spring Batch builds upon the characteristics of the Spring Framework that people have come to expect (productivity, POJO-based development approach, and general ease of use), while making it easy for developers to access and leverage more advance enterprise services when necessary. Spring Batch is not a scheduling framework. There are many good enterprise schedulers (such as Quartz, Tivoli, Control-M, etc.) available in both the commercial and open source spaces. It is intended to work in conjunction with a scheduler, not replace a scheduler.
+
+Spring Batch provides reusable functions that are essential in processing large volumes of records, including logging/tracing, transaction management, job processing statistics, job restart, skip, and resource management. It also provides more advanced technical services and features that enable extremely high-volume and high performance batch jobs though optimization and partitioning techniques. Spring Batch can be used in both simple use cases (such as reading a file into a database or running a stored procedure) as well as complex, high volume use cases (such as moving high volumes of data between databases, transforming it, and so on). High-volume batch jobs can leverage the framework in a highly scalable manner to process significant volumes of information.
+
+Background
+While open source software projects and associated communities have focused greater attention on web-based and microservices-based architecture frameworks, there has been a notable lack of focus on reusable architecture frameworks to accommodate Java-based batch processing needs, despite continued needs to handle such processing within enterprise IT environments. The lack of a standard, reusable batch architecture has resulted in the proliferation of many one-off, in-house solutions developed within client enterprise IT functions.
+
+SpringSource (now Pivotal) and Accenture collaborated to change this. Accenture’s hands-on industry and technical experience in implementing batch architectures, SpringSource’s depth of technical experience, and Spring’s proven programming model together made a natural and powerful partnership to create high-quality, market-relevant software aimed at filling an important gap in enterprise Java. Both companies worked with a number of clients who were solving similar problems by developing Spring-based batch architecture solutions. This provided some useful additional detail and real-life constraints that helped to ensure the solution can be applied to the real-world problems posed by clients.
+
+Accenture contributed previously proprietary batch processing architecture frameworks to the Spring Batch project, along with committer resources to drive support, enhancements, and the existing feature set. Accenture’s contribution was based upon decades of experience in building batch architectures with the last several generations of platforms: COBOL/Mainframe, C++/Unix, and now Java/anywhere.
+
+The collaborative effort between Accenture and SpringSource aimed to promote the standardization of software processing approaches, frameworks, and tools that can be consistently leveraged by enterprise users when creating batch applications. Companies and government agencies desiring to deliver standard, proven solutions to their enterprise IT environments can benefit from Spring Batch.
+
+Usage Scenarios
+A typical batch program generally:
+
+Reads a large number of records from a database, file, or queue.
+
+Processes the data in some fashion.
+
+Writes back data in a modified form.
+
+Spring Batch automates this basic batch iteration, providing the capability to process similar transactions as a set, typically in an offline environment without any user interaction. Batch jobs are part of most IT projects, and Spring Batch is the only open source framework that provides a robust, enterprise-scale solution.
+
+Business Scenarios
+
+Commit batch process periodically
+
+Concurrent batch processing: parallel processing of a job
+
+Staged, enterprise message-driven processing
+
+Massively parallel batch processing
+
+Manual or scheduled restart after failure
+
+Sequential processing of dependent steps (with extensions toworkflow-driven batches)
+
+Partial processing: skip records (for example, on rollback)
+
+Whole-batch transaction, for cases with a small batch size or existing stored procedures/scripts
+
+Technical Objectives
+
+Batch developers use the Spring programming model: Concentrate on business logic and let the framework take care of infrastructure.
+
+Clear separation of concerns between the infrastructure, the batch execution environment, and the batch application.
+
+Provide common, core execution services as interfaces that all projects can implement.
+
+Provide simple and default implementations of the core execution interfaces that can be used 'out of the box'.
+
+Easy to configure, customize, and extend services, by leveraging the spring framework in all layers.
+
+All existing core services should be easy to replace or extend, without any impact to the infrastructure layer.
+
+Provide a simple deployment model, with the architecture JARs completely separate from the application, built using Maven.
+Spring Batch Architecture
+Spring Batch is designed with extensibility and a diverse group of end users in mind. The figure below shows the layered architecture that supports the extensibility and ease of use for end-user developers.
+
+Figure 1.1: Spring Batch Layered Architecture
+Figure 1. Spring Batch Layered Architecture
+This layered architecture highlights three major high-level components: Application, Core, and Infrastructure. The application contains all batch jobs and custom code written by developers using Spring Batch. The Batch Core contains the core runtime classes necessary to launch and control a batch job. It includes implementations for JobLauncher, Job, and Step. Both Application and Core are built on top of a common infrastructure. This infrastructure contains common readers and writers and services (such as the RetryTemplate), which are used both by application developers(readers and writers, such as ItemReader and ItemWriter) and the core framework itself (retry, which is its own library).
+
+General Batch Principles and Guidelines
+The following key principles, guidelines, and general considerations should be considered when building a batch solution.
+
+Remember that a batch architecture typically affects on-line architecture and vice versa. Design with both architectures and environments in mind using common building blocks when possible.
+
+Simplify as much as possible and avoid building complex logical structures in single batch applications.
+
+Keep the processing and storage of data physically close together (in other words, keep your data where your processing occurs).
+
+Minimize system resource use, especially I/O. Perform as many operations as possible in internal memory.
+
+Review application I/O (analyze SQL statements) to ensure that unnecessary physical I/O is avoided. In particular, the following four common flaws need to be looked for:
+
+Reading data for every transaction when the data could be read once and cached or kept in the working storage.
+
+Rereading data for a transaction where the data was read earlier in the same transaction.
+
+Causing unnecessary table or index scans.
+
+Not specifying key values in the WHERE clause of an SQL statement.
+
+Do not do things twice in a batch run. For instance, if you need data summarization for reporting purposes, you should (if possible) increment stored totals when data is being initially processed, so your reporting application does not have to reprocess the same data.
+
+Allocate enough memory at the beginning of a batch application to avoid time-consuming reallocation during the process.
+
+Always assume the worst with regard to data integrity. Insert adequate checks and record validation to maintain data integrity.
+
+Implement checksums for internal validation where possible. For example, flat files should have a trailer record telling the total of records in the file and an aggregate of the key fields.
+
+Plan and execute stress tests as early as possible in a production-like environment with realistic data volumes.
+
+In large batch systems, backups can be challenging, especially if the system is running concurrent with on-line on a 24-7 basis. Database backups are typically well taken care of in the on-line design, but file backups should be considered to be just as important. If the system depends on flat files, file backup procedures should not only be in place and documented but be regularly tested as well.
+
+Batch Processing Strategies
+To help design and implement batch systems, basic batch application building blocks and patterns should be provided to the designers and programmers in the form of sample structure charts and code shells. When starting to design a batch job, the business logic should be decomposed into a series of steps that can be implemented using the following standard building blocks:
+
+Conversion Applications: For each type of file supplied by or generated to an external system, a conversion application must be created to convert the transaction records supplied into a standard format required for processing. This type of batch application can partly or entirely consist of translation utility modules (see Basic Batch Services).
+
+Validation Applications: Validation applications ensure that all input/output records are correct and consistent. Validation is typically based on file headers and trailers, checksums and validation algorithms, and record level cross-checks.
+
+Extract Applications: An application that reads a set of records from a database or input file, selects records based on predefined rules, and writes the records to an output file.
+
+Extract/Update Applications: An application that reads records from a database or an input file and makes changes to a database or an output file driven by the data found in each input record.
+
+Processing and Updating Applications: An application that performs processing on input transactions from an extract or a validation application. The processing usually involves reading a database to obtain data required for processing, potentially updating the database and creating records for output processing.
+
+Output/Format Applications: Applications that read an input file, restructure data from this record according to a standard format, and produce an output file for printing or transmission to another program or system.
+
+Additionally, a basic application shell should be provided for business logic that cannot be built using the previously mentioned building blocks.
+
+In addition to the main building blocks, each application may use one or more of standard utility steps, such as:
+
+Sort: A program that reads an input file and produces an output file where records have been re-sequenced according to a sort key field in the records. Sorts are usually performed by standard system utilities.
+
+Split: A program that reads a single input file and writes each record to one of several output files based on a field value. Splits can be tailored or performed by parameter-driven standard system utilities.
+
+Merge: A program that reads records from multiple input files and produces one output file with combined data from the input files. Merges can be tailored or performed by parameter-driven standard system utilities.
+
+Batch applications can additionally be categorized by their input source:
+
+Database-driven applications are driven by rows or values retrieved from the database.
+
+File-driven applications are driven by records or values retrieved from a file.
+
+Message-driven applications are driven by messages retrieved from a message queue.
+
+The foundation of any batch system is the processing strategy. Factors affecting the selection of the strategy include: estimated batch system volume, concurrency with on-line systems or with other batch systems, available batch windows. (Note that, with more enterprises wanting to be up and running 24x7, clear batch windows are disappearing).
+
+Typical processing options for batch are (in increasing order of implementation complexity):
+
+Normal processing during a batch window in off-line mode.
+
+Concurrent batch or on-line processing.
+
+Parallel processing of many different batch runs or jobs at the same time.
+
+Partitioning (processing of many instances of the same job at the same time).
+
+A combination of the preceding options.
+
+Some or all of these options may be supported by a commercial scheduler.
+
+The following section discusses these processing options in more detail. It is important to notice that, as a rule of thumb, the commit and locking strategy adopted by batch processes depends on the type of processing performed and that the on-line locking strategy should also use the same principles. Therefore, the batch architecture cannot be simply an afterthought when designing an overall architecture.
+
+The locking strategy can be to use only normal database locks or to implement an additional custom locking service in the architecture. The locking service would track database locking (for example, by storing the necessary information in a dedicated db-table) and give or deny permissions to the application programs requesting a db operation. Retry logic could also be implemented by this architecture to avoid aborting a batch job in case of a lock situation.
