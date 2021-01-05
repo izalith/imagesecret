@@ -31,7 +31,7 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bootstrap": "^4.4.1",
     "buffer": "^5.4.3",
     "classnames": "^2.2.6",
